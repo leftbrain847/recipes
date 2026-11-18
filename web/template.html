@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recipe Book</title>
+<style>
+  /* Layout idea: one column, thumb-first. Picker -> recipe -> tabbed panes. */
+  :root {
+    --bg:        #fbfaf5;
+    --surface:   #ffffff;
+    --ink:       #1a1c19;
+    --muted:     #6b6f68;
+    --line:      #dcded4;
+    --accent:    #2f6f33;
+    --accent-bg: #e9f1e7;
+    --display: Georgia, "Times New Roman", serif;   /* system only: the publish gate refuses third-party fonts */
+    --body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --r: 12px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:        #131510;
+      --surface:   #1c1f19;
+      --ink:       #ecefe6;
+      --muted:     #9aa193;
+      --line:      #2f3429;
+      --accent:    #8cc98c;
+      --accent-bg: #222b20;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:        #131510;
+    --surface:   #1c1f19;
+    --ink:       #ecefe6;
+    --muted:     #9aa193;
+    --line:      #2f3429;
+    --accent:    #8cc98c;
+    --accent-bg: #222b20;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 56px; }
+
+  /* ---------- header ---------- */
+  header { padding: 22px 0 14px; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .sub { color: var(--muted); font-size: 0.86rem; margin: 4px 0 0; }
+
+  /* ---------- recipe list ---------- */
+  .list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .card {
+    display: block; width: 100%; text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 14px 15px;
+    color: inherit; font: inherit; cursor: pointer;
+    border-left: 4px solid var(--accent);
+  }
+  .card:active { transform: scale(0.995); }
+  .card h2 {
+    font-family: var(--display); font-weight: 700;
+    font-size: 1.1rem; margin: 0 0 3px; letter-spacing: -0.01em;
+  }
+  .card p { margin: 0; font-size: 0.87rem; color: var(--muted); }
+  .card .meta {
+    margin-top: 7px; font-size: 0.74rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- recipe view ---------- */
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 0; padding: 14px 0 2px; margin: 0;
+    color: var(--accent); font: inherit; font-size: 0.88rem;
+    font-weight: 500; cursor: pointer;
+  }
+  .rmeta {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0;
+  }
+  .pill {
+    font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--accent-bg); color: var(--accent);
+    border-radius: 999px; padding: 4px 10px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabs {
+    display: flex; gap: 4px; margin: 16px 0 0;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 4px;
+    position: sticky; top: 8px; z-index: 5;
+  }
+  .tab {
+    flex: 1; border: 0; background: none; color: var(--muted);
+    font: inherit; font-size: 0.85rem; font-weight: 500;
+    padding: 9px 4px; border-radius: 7px; cursor: pointer;
+  }
+  .tab[aria-selected="true"] { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .pane { margin-top: 16px; }
+
+  /* ---------- prep banner ---------- */
+  .prep {
+    background: var(--accent-bg); border-radius: var(--r);
+    padding: 12px 14px; margin-bottom: 14px;
+  }
+  .prep h3 {
+    margin: 0 0 7px; font-size: 0.72rem; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .prep ul { margin: 0; padding-left: 17px; }
+  .prep li { font-size: 0.89rem; margin-bottom: 5px; }
+  .prep li:last-child { margin-bottom: 0; }
+
+  /* ---------- steps ---------- */
+  .steps { display: flex; flex-direction: column; gap: 9px; }
+  .step {
+    display: flex; gap: 12px; width: 100%; text-align: left;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 13px 14px;
+    color: inherit; font: inherit; cursor: pointer;
+  }
+  .step.done { opacity: 0.45; }
+  .step.done .act { text-decoration: line-through; }
+  .num {
+    flex: 0 0 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-bg); color: var(--accent);
+    display: grid; place-items: center;
+    font-size: 0.8rem; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .step.done .num { background: var(--accent); color: var(--surface); }
+  .act { font-size: 1rem; line-height: 1.4; }
+  .uses { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .use {
+    font-size: 0.78rem; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 6px; padding: 3px 7px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- ingredients ---------- */
+  .ings { display: flex; flex-direction: column; gap: 0; }
+  .ing {
+    display: flex; gap: 11px; align-items: flex-start; width: 100%;
+    text-align: left; background: none; border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 2px; color: inherit; font: inherit; cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .box {
+    flex: 0 0 19px; height: 19px; margin-top: 2px;
+    border: 1.5px solid var(--line); border-radius: 5px;
+  }
+  .ing.got .box { background: var(--accent); border-color: var(--accent); }
+  .ing.got span { opacity: 0.42; text-decoration: line-through; }
+
+  /* ---------- grid ---------- */
+  .scroller {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line); border-radius: var(--r);
+    background: var(--surface);
+  }
+  table { border-collapse: collapse; font-size: 0.78rem; }
+  td {
+    border: 1px solid var(--line); padding: 7px 9px;
+    vertical-align: middle; white-space: pre-line;
+  }
+  td.gi {
+    position: sticky; left: 0; z-index: 2;
+    background: var(--surface); min-width: 170px; max-width: 170px;
+    font-variant-numeric: tabular-nums;
+    border-right: 2px solid var(--line);
+  }
+  td.gs { text-align: center; font-weight: 600; min-width: 108px; }
+  .hint { font-size: 0.78rem; color: var(--muted); margin: 8px 2px 0; }
+
+  /* ---------- notes ---------- */
+  .notes { display: flex; flex-direction: column; gap: 11px; }
+  .note {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 12px 14px;
+    font-size: 0.9rem; line-height: 1.55;
+  }
+  .note b {
+    display: block; font-size: 0.72rem; letter-spacing: 0.08em;
+    color: var(--accent); margin-bottom: 4px; font-weight: 600;
+  }
+
+  .tools { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .tool {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px; color: var(--muted);
+    font: inherit; font-size: 0.82rem; cursor: pointer;
+  }
+  .tool[aria-pressed="true"] { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script type="application/json" id="recipe-data">
+{}
+</script>
+<script>
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const app = document.getElementById("app");
+
+let DATA = { recipes: [] };
+let tab = "steps";
+let wake = null;
+
+/* per-viewer conveniences only; never load-bearing */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+function noteHtml(n) {
+  const m = n.match(/^([A-Z][A-Z0-9 ,'\-]{3,}?)(\s*[—:.]\s*|\s+)(.*)$/s);
+  if (m && m[1].trim().split(" ").length <= 6) {
+    return `<b>${esc(m[1].trim())}</b>${esc(m[3])}`;
+  }
+  return esc(n);
+}
+
+function renderList() {
+  app.innerHTML = "";
+  app.append($(`<header>
+    <h1>Recipe Book</h1>
+    <p class="sub">${DATA.recipes.length} recipes, laid out as combination grids.</p>
+  </header>`));
+  const list = $(`<div class="list"></div>`);
+  DATA.recipes.forEach(r => {
+    const c = $(`<button class="card">
+      <h2>${esc(r.name)}</h2>
+      <p>${esc(r.blurb)}</p>
+      <div class="meta">${esc(r.category)} &nbsp;·&nbsp; serves ${esc(r.serves)}</div>
+    </button>`);
+    c.onclick = () => { location.hash = slug(r.name); };
+    list.append(c);
+  });
+  app.append(list);
+}
+
+function renderRecipe(r) {
+  app.innerHTML = "";
+  const back = $(`<button class="back">&larr; All recipes</button>`);
+  back.onclick = () => { location.hash = ""; };
+  app.append(back);
+
+  app.append($(`<header style="padding-top:6px">
+    <h1>${esc(r.name)}</h1>
+    <p class="sub">${esc(r.subtitle)}</p>
+    <div class="rmeta">
+      <span class="pill">serves ${esc(r.serves)}</span>
+      <span class="pill">${esc(r.steps.length)} steps</span>
+      <span class="pill">${esc(r.ingredients.length)} ingredients</span>
+    </div>
+  </header>`));
+
+  const names = { steps: "Steps", ings: "Ingredients", grid: "Grid", notes: "Notes" };
+  const tabs = $(`<div class="tabs" role="tablist"></div>`);
+  Object.keys(names).forEach(k => {
+    const b = $(`<button class="tab" role="tab" aria-selected="${k === tab}">${names[k]}</button>`);
+    b.onclick = () => { tab = k; renderRecipe(r); };
+    tabs.append(b);
+  });
+  app.append(tabs);
+
+  const pane = $(`<div class="pane"></div>`);
+  app.append(pane);
+
+  if (tab === "steps") {
+    if (r.prep.length) {
+      pane.append($(`<div class="prep"><h3>Before you start</h3><ul>${
+        r.prep.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>`));
+    }
+    const key = "done:" + slug(r.name);
+    let done = store.get(key, []);
+    const wrapEl = $(`<div class="steps"></div>`);
+    r.steps.forEach((s, i) => {
+      const on = done.includes(i);
+      const el = $(`<button class="step${on ? " done" : ""}">
+        <div class="num">${i + 1}</div>
+        <div class="act">${esc(s)}</div>
+      </button>`);
+      el.onclick = () => {
+        done = done.includes(i) ? done.filter(x => x !== i) : done.concat(i);
+        store.set(key, done);
+        el.classList.toggle("done");
+      };
+      wrapEl.append(el);
+    });
+    pane.append(wrapEl);
+
+    const tools = $(`<div class="tools"></div>`);
+    const reset = $(`<button class="tool">Clear checkmarks</button>`);
+    reset.onclick = () => { store.set(key, []); renderRecipe(r); };
+    tools.append(reset);
+    if ("wakeLock" in navigator) {
+      const w = $(`<button class="tool" aria-pressed="${!!wake}">Keep screen on</button>`);
+      w.onclick = async () => {
+        try {
+          if (wake) { await wake.release(); wake = null; }
+          else { wake = await navigator.wakeLock.request("screen"); wake.onrelease = () => { wake = null; }; }
+          w.setAttribute("aria-pressed", !!wake);
+        } catch (e) { w.textContent = "Screen lock unavailable"; w.disabled = true; }
+      };
+      tools.append(w);
+    }
+    pane.append(tools);
+  }
+
+  if (tab === "ings") {
+    const key = "got:" + slug(r.name);
+    let got = store.get(key, []);
+    const ul = $(`<div class="ings"></div>`);
+    r.ingredients.forEach((ing, i) => {
+      const on = got.includes(i);
+      const el = $(`<button class="ing${on ? " got" : ""}"><div class="box"></div><span>${esc(ing)}</span></button>`);
+      el.onclick = () => {
+        got = got.includes(i) ? got.filter(x => x !== i) : got.concat(i);
+        store.set(key, got);
+        el.classList.toggle("got");
+      };
+      ul.append(el);
+    });
+    pane.append(ul);
+    const tools = $(`<div class="tools"></div>`);
+    const reset = $(`<button class="tool">Clear checkmarks</button>`);
+    reset.onclick = () => { store.set(key, []); renderRecipe(r); };
+    tools.append(reset);
+    pane.append(tools);
+  }
+
+  if (tab === "grid") {
+    if (r.prep.length) {
+      pane.append($(`<div class="prep"><h3>Before you start</h3><ul>${
+        r.prep.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>`));
+    }
+    let html = "<table><tbody>";
+    r.grid.forEach(row => {
+      html += `<tr><td class="gi">${esc(row.ing)}</td>`;
+      row.cells.forEach(c => {
+        if (c === null) return;
+        html += `<td class="gs"${c.span > 1 ? ` rowspan="${c.span}"` : ""}>${esc(c.text)}</td>`;
+      });
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    pane.append($(`<div class="scroller">${html}</div>`));
+    pane.append($(`<p class="hint">The original combination grid. Scroll it sideways; the ingredient column stays put.</p>`));
+  }
+
+  if (tab === "notes") {
+    pane.append($(`<div class="notes">${
+      r.notes.map(n => `<div class="note">${noteHtml(n)}</div>`).join("")}</div>`));
+  }
+}
+
+function route() {
+  const h = location.hash.replace(/^#/, "");
+  const r = DATA.recipes.find(x => slug(x.name) === h);
+  if (r) { renderRecipe(r); window.scrollTo(0, 0); }
+  else renderList();
+}
+
+DATA = JSON.parse(document.getElementById("recipe-data").textContent);
+route();
+
+window.addEventListener("hashchange", () => { tab = "steps"; route(); });
+</script>
+</body>
+</html>
