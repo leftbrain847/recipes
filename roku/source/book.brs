@@ -49,6 +49,11 @@ function TabCount(s as Object) as Integer
     return r.notes.Count()
 end function
 
+function IsInt(v as Dynamic) as Boolean
+    t = type(v)
+    return t = "Integer" or t = "roInteger" or t = "roInt" or t = "LongInteger" or t = "roLongInteger"
+end function
+
 function Clamp(v as Integer, lo as Integer, hi as Integer) as Integer
     if v < lo then return lo
     if v > hi then return hi
@@ -62,7 +67,7 @@ sub OpenRecipe(s as Object)
     s.checked = {}
     s.step = 0
     saved = s.progress[Current(s).name]
-    if saved <> invalid then s.step = Clamp(saved, 0, StepPages(Current(s)).Count() - 1)
+    if IsInt(saved) then s.step = Clamp(saved, 0, StepPages(Current(s)).Count() - 1)
 end sub
 
 ' Applies one key press. Returns "exit" when the app should close, else "".
@@ -87,6 +92,7 @@ function HandleKey(s as Object, code as Integer, cfg as Object) as String
     if code = k.left or code = k.right then s.cur = 0
 
     last = TabCount(s) - 1
+    if last < 0 then return ""     ' empty tab: nothing to move through
     if s.tab = 0 then
         before = s.step
         if code = k.down or code = k.fwd or code = k.ok or code = k.play then s.step = Clamp(s.step + 1, 0, last)
@@ -157,7 +163,7 @@ function LoadProgress(cfg as Object) as Object
     v = sec.Read("progress")
     if v = "" then return {}
     p = ParseJson(v)
-    if p = invalid then return {}
+    if type(p) <> "roAssociativeArray" then return {}
     return p
 end function
 

@@ -14,6 +14,7 @@ sub Main()
     TestSteps(t, book, cfg)
     TestIngredients(t, book, cfg)
     TestWrapAndScroll(t)
+    TestEmptyAndBadProgress(t, cfg)
     print "RESULT pass=" + t.pass.ToStr() + " fail=" + t.fail.ToStr()
 end sub
 
@@ -122,4 +123,16 @@ sub TestWrapAndScroll(t as Object)
     Check(t, ScrollTop(h, 1, 0, 250) = 0, "visible item: no scroll")
     Check(t, ScrollTop(h, 3, 0, 250) = 2, "scrolls just enough to show the item")
     Check(t, ScrollTop(h, 0, 3, 250) = 0, "scrolls back up")
+end sub
+
+' An empty tab and bad saved progress must not crash.
+sub TestEmptyAndBadProgress(t as Object, cfg as Object)
+    k = cfg.keys
+    r = { name: "Empty", category: "x", serves: 1, subtitle: "", prep: [], ingredients: [], steps: ["only"], notes: [] }
+    s = NewState([r], { "Empty": "garbage" })
+    HandleKey(s, k.ok, cfg)
+    Check(t, s.step = 0, "non-integer saved progress is ignored")
+    HandleKey(s, k.right, cfg)
+    HandleKey(s, k.down, cfg)
+    Check(t, s.cur = 0, "Down on an empty list stays put")
 end sub

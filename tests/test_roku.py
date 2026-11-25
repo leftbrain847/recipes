@@ -27,3 +27,10 @@ def test_roku_data_has_every_recipe_and_step():
 def test_roku_data_has_no_urls():
     """The package gate refuses any http(s) URL in the app's code or data."""
     assert "http://" not in build_roku.build() and "https://" not in build_roku.build()
+
+
+def test_roku_lists_are_never_empty():
+    """The app has a page or row for each entry; an empty list would leave a tab blank."""
+    for r in json.loads(build_roku.build())["recipes"]:
+        for field in ("ingredients", "steps", "notes"):
+            assert r[field], f"{r['name']}: no {field}"

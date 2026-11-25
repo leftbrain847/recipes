@@ -91,6 +91,7 @@ sub DrawStepPage(screen as Object, fonts as Object, cfg as Object, s as Object, 
     L = cfg.layout
     width = cfg.screen.w - 2 * L.margin
     pages = StepPages(Current(s))
+    if pages.Count() = 0 then return
     page = pages[s.step]
     screen.DrawText(page.title, L.margin, y0, c.accent, fonts.head)
     y = y0 + 52
@@ -121,6 +122,7 @@ sub DrawStepPage(screen as Object, fonts as Object, cfg as Object, s as Object, 
 end sub
 
 sub DrawList(screen as Object, fonts as Object, cfg as Object, s as Object, items as Object, y0 as Integer, checks as Boolean)
+    if items.Count() = 0 then return
     c = cfg.colors
     L = cfg.layout
     indent = 0
