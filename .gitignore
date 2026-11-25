@@ -25,3 +25,7 @@ Thumbs.db
 
 # Claude Code
 .claude/worktrees/
+
+# Roku build output
+dist/
+out/

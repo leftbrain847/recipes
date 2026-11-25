@@ -1,0 +1,73 @@
+# Publishes the Roku sideload zip (the recipe book app in roku/) as a GitHub release when it changes on main.
+# The zip is published only if the tests and the package security gate pass.
+# To ship a new version (new recipes included), bump build_version in roku/manifest; an existing version is never overwritten.
+name: release
+on:
+  push:
+    branches: [main]
+    paths:
+      - "roku/**"
+      - "scripts/build.mjs"
+      - "scripts/zip.mjs"
+      - "scripts/check-package.mjs"
+      - "scripts/package.config.json"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - run: npm ci
+      - run: npm test
+      - run: |
+          pip install -q pytest
+          pytest -q
+
+  publish:
+    needs: test
+    if: github.ref == 'refs/heads/main'   # a manual run on another branch never publishes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write   # create the release; this job installs no npm packages
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Build and security-check the zip (Node built-ins only)
+        run: |
+          node scripts/build.mjs
+          node scripts/check-package.mjs
+      - name: Publish the release if this version is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          get() { grep -E "^$1=" roku/manifest | head -1 | cut -d= -f2 | tr -cd '0-9'; }
+          tag="roku-v$(get major_version).$(get minor_version).$(get build_version)"
+          [[ "$tag" =~ ^roku-v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "bad manifest version: $tag"; exit 1; }
+          if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release $tag already exists; bump build_version in roku/manifest to publish a new one."
+            exit 0
+          fi
+          if gh api "repos/$REPO/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag exists without a release; bump build_version instead of reusing it."
+            exit 1
+          fi
+          zip="$(node -p "const c=require('./scripts/package.config.json'); c.outDir + '/' + c.zipName")"
+          cat > notes.md <<'NOTES'
+          Roku sideload build of the Recipe Book. Passed the tests and the package security check (app code, recipe data and images only, no known network APIs, no secret-like strings).
+
+          Install: on the remote press Home x3, Up x2, Right, Left, Right, Left, Right to turn on developer mode. Open the Roku's IP address in a browser on the same Wi-Fi, sign in as rokudev, upload recipes_roku.zip and press Install. A Roku holds one sideloaded app at a time, so this replaces whatever was sideloaded before (e.g. Kart).
+          NOTES
+          gh release create "$tag" "$zip" --repo "$REPO" --target "$GITHUB_SHA" --title "Recipe Book $tag (Roku sideload)" --notes-file notes.md

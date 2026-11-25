@@ -1,0 +1,7 @@
+{
+  "rootDir": "roku",
+  "files": ["manifest", "source/**/*.brs", "data/**/*", "images/**/*"],
+  "createPackage": false,
+  "retainStagingDir": false,
+  "diagnosticFilters": []
+}

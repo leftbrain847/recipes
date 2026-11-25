@@ -1,0 +1,31 @@
+{
+  "$comment": "What goes in the Roku sideload zip, and what the security check allows. Read by scripts/build.mjs and scripts/check-package.mjs. The app is roku/; the recipes ship inside it as data/recipes.json, so it makes no network calls. maxBytes stays under Roku's sideload install limit (2 MB zipped in older Roku docs).",
+  "root": "roku",
+  "zipName": "recipes_roku.zip",
+  "outDir": "dist",
+  "include": ["manifest", "source", "data", "images"],
+  "allowedExtensions": [".brs", ".json", ".png"],
+  "maxBytes": 1900000,
+  "forbiddenCode": [
+    "roUrlTransfer",
+    "roSocketAddress",
+    "roStreamSocket",
+    "roDataGramSocket",
+    "roHttpAgent",
+    "roChannelStore",
+    "roSystemLog",
+    "http://",
+    "https://"
+  ],
+  "secretPatterns": [
+    "-----BEGIN [A-Z ]*PRIVATE KEY-----",
+    "ghp_[A-Za-z0-9]{20,}",
+    "github_pat_[A-Za-z0-9_]{20,}",
+    "AKIA[0-9A-Z]{16}",
+    "sk-[A-Za-z0-9]{20,}",
+    "AIza[0-9A-Za-z_-]{30,}",
+    "xox[baprs]-[A-Za-z0-9-]{10,}",
+    "(?i)(api[_-]?key|secret|password|token)\\s*[:=]\\s*\"[^\"]{8,}\""
+  ],
+  "manifestRequired": ["title", "major_version", "minor_version", "build_version"]
+}
