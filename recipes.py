@@ -419,6 +419,70 @@ recipe(
 )
 
 
+# ---------------- Thanksgiving Apple Pie with Crumble Top ----------------
+recipe(
+    "Thanksgiving Apple Pie", "Dessert / bake", 8,
+    "Deep-dish, precooked apples, cider syrup, crumble top.",
+    "A tall 9-inch deep-dish apple pie with precooked apples, cider syrup, and "
+    "a buttery crumble instead of a top crust. Serves 8.",
+    ["Make the dough a day ahead if you can: it needs at least 1 hr in the "
+     "fridge and keeps up to 2 days",
+     "Have out a Dutch oven, a small saucepan, two sheet pans and a 9 in "
+     "deep-dish pie plate",
+     "Leave at least 4 hr after baking for the pie to cool and set before "
+     "anyone slices it"],
+    [
+        ("6.1 oz (173 g) all-purpose flour, for the crust", [
+            (2, 3, "whisk"),
+            (3, 4, "cut in butter\nto pea- and\nalmond-sized\npieces"),
+            (4, 6, "fold in just\nuntil it holds\nwhen squeezed\n\none disc,\nwrap, chill\n1 hr (up to\n2 days)"),
+            (6, 22, "heat oven to 425°F\nwith a sheet pan\non the lowest rack\n\nroll dough to 12 in,\nfit a 9 in deep dish,\ntrim, fold under,\ncrimp\n\nmound in apples,\npile on crumble,\npress lightly\n\nchill while the\noven heats"),
+            (7, 22, "bake on the hot\nsheet pan 425°F\n25 min, until\nedge and crumble\nstart to color\n\nlower to 375°F,\nfoil the crust edge\n(tent the top if\nit darkens fast)\n\n35–50 min more,\nuntil thick juices\nbubble slowly at\nthe edges\n\ncool on a rack\nat least 4 hr"),
+        ]),
+        ("1 1/2 tsp sugar, for the crust", []),
+        ("0.4 tsp fine salt, for the crust", []),
+        ("4.4 oz (125 g) cold unsalted butter, cubed, for the crust", []),
+        ("2 Tbs cold vodka", [(2, 2, None), (3, 2, None)]),
+        ("2 Tbs ice water", []),
+        ("1 cup apple cider", [
+            (2, 1, "simmer down\nto about 1/4\nof its volume"),
+            (3, 1, None),
+            (4, 9, "spread apples\non a sheet pan\nto cool\n\ndrain all their\njuice into the\ncider pan\n\nboil to about\n1/2 cup syrup,\nstir in the\nlemon juice"),
+            (5, 10, "toss cooled\napples with\nthe starch,\nthen with\nthe warm\nsyrup"),
+        ]),
+        ("4.41 lb (2 kg) apples, half Granny Smith, half Honeycrisp or Braeburn", [
+            (2, 1, "peel, core,\nslice 1/4 in\n(6 mm)"),
+            (3, 8, "Dutch oven,\ncovered,\nmedium-low,\nstir often\n\n~12 min, until\nslices bend but\nhold their shape\n\nno hard boil"),
+        ]),
+        ("3.53 oz (100 g) granulated sugar", []),
+        ("1.76 oz (50 g) packed brown sugar, for the filling", []),
+        ("1 tsp ground cinnamon, for the filling", []),
+        ("1/4 tsp ground nutmeg", []),
+        ("1/8 tsp (0.12 tsp) ground allspice", []),
+        ("1/4 tsp fine salt, for the filling", []),
+        ("1 lemon, zested and juiced", [(2, 1, "zest\n(juice\nkept for\nthe syrup)")]),
+        ("2 Tbs tapioca starch (or 1 1/2 Tbs cornstarch)", [(2, 1, None), (3, 1, None), (4, 1, None)]),
+        ("4.25 oz (120 g) all-purpose flour, for the crumble", [
+            (2, 5, "whisk"),
+            (3, 6, "rub in butter\nwith fingertips\nto pea- and\nmarble-sized\nclumps\n\nchill until\nneeded"),
+        ]),
+        ("3.5 oz (100 g) packed brown sugar, for the crumble", []),
+        ("1/2 cup rolled oats (optional)", []),
+        ("1/2 tsp ground cinnamon, for the crumble", []),
+        ("1/4 tsp fine salt, for the crumble", []),
+        ("3 oz (85 g) cold unsalted butter, cubed, for the crumble", []),
+    ],
+    [
+        "I scaled the dough down to about 55% of your original, which is the bottom-crust disc, so there's no leftover dough.",
+        "Timing is the same as your original: dough Tuesday, filling Wednesday morning, bake Wednesday afternoon.",
+        "The starch only sets once the filling bubbles, so bake until thick juices bubble slowly at the edges of the crumble, and cool at least 4 hours before slicing.",
+        "A day-old pie slices cleanest.",
+        "Serve with vanilla ice cream or sharp cheddar.",
+    ],
+    6,
+)
+
+
 # ===========================================================================
 # Cook order
 # ---------------------------------------------------------------------------
@@ -506,6 +570,19 @@ COOK = {
  "Oil your hands. Divide into 8 balls, press a deep well in each, seal a frozen cheese puck inside, then roll smooth and flatten to about 3/4 in. Check each one for cracks.",
  "Dust both sides with cornstarch.",
  "Fry in the oil over medium, 4 to 5 minutes per side, until deep gold. Drain on a rack.",
+],
+
+"Thanksgiving Apple Pie": [
+ "Make the dough (1 hr, up to 2 days ahead). Whisk the 6.1 oz of flour, 1 1/2 tsp sugar and 0.4 tsp fine salt. Cut in the 4.4 oz of cold cubed butter until the pieces range from pea- to almond-sized; you want visible butter. Sprinkle in the 2 Tbs cold vodka and 2 Tbs ice water and fold with a spatula just until the dough holds when squeezed. Shape into one disc, wrap, and chill. Keeps up to 2 days.",
+ "Reduce the cider (15 min). Simmer the 1 cup of apple cider in a small saucepan until it is down to about a quarter of the volume. Set aside.",
+ "Precook the apples (12 min). Peel, core, and slice the 4.41 lb of apples 1/4 in (6 mm) thick. Put them in a Dutch oven with the 3.53 oz granulated sugar, 1.76 oz brown sugar, 1 tsp cinnamon, 1/4 tsp nutmeg, 1/8 tsp allspice, 1/4 tsp fine salt and the lemon zest. Cover and cook over medium-low, stirring often, until the slices bend but still hold their shape. Don't let it boil hard.",
+ "Cool and drain (30 min). Spread the apples on a sheet pan to cool. Then drain all the juice they released into the cider pan.",
+ "Make the syrup (8 min). Boil the juice and cider together until about 1/2 cup of syrup remains. Stir in the lemon juice. Toss the cooled apples with the 2 Tbs tapioca starch (or 1 1/2 Tbs cornstarch), then with the warm syrup.",
+ "Make the crumble. Whisk the 4.25 oz flour, 3.5 oz brown sugar, 1/2 cup rolled oats (optional), 1/2 tsp cinnamon and 1/4 tsp fine salt. Rub in the 3 oz of cold cubed butter with your fingertips until you have clumps ranging from pea- to marble-sized. Chill until needed.",
+ "Assemble (20 min). Put a sheet pan on the lowest rack and heat the oven to 425°F. Roll the dough to 12 in and fit it into a 9 in deep-dish pie plate. Trim, fold the edge under, and crimp. Mound in the apples, then pile the crumble over the top, pressing lightly. Chill the pie while the oven heats.",
+ "Hot start (25 min). Bake on the preheated sheet pan at 425°F until the crust edge and crumble start to color.",
+ "Finish the bake (45 min). Lower the oven to 375°F and shield the crust edges with foil. If the crumble darkens too fast, tent the top loosely with foil. Bake until the crust is deep golden and thick juices bubble slowly at the edges of the crumble, usually 35 to 50 minutes. The starch only sets once the filling bubbles.",
+ "Cool fully (4 hr). Cool on a rack for at least 4 hours before slicing so the filling sets.",
 ],
 
 }
