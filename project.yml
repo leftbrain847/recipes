@@ -4,4 +4,4 @@ tags: [python, artifact, roku]   # from the index's config.tags; new tags lowerc
 what: Eight recipes as combination grids, built to cook from on a phone, plus a Roku sideload app to cook from the TV.
 next: Try the Roku app on the TV (readable from the counter?), then decide whether the repo goes public so the homepage tile gets a Code link.
 active: false         # true pulls this repo's tasks into J's queue
-public: false         # informational; each sprint day's snapshot decides publishing
+public: true          # informational; each sprint day's snapshot decides publishing
