@@ -1,0 +1,19 @@
+{
+  "name": "recipes",
+  "version": "1.0.0",
+  "description": "Recipe book: web page and a Roku sideload app (BrightScript, roScreen/Draw2D)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-package.mjs"
+  },
+  "devDependencies": {
+    "brighterscript": "0.73.8",
+    "brs-node": "2.7.1"
+  },
+  "overrides": {
+    "decode-uri-component": "0.5.1"
+  }
+}

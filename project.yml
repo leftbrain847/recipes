@@ -1,7 +1,7 @@
 # Read nightly by leftbrain847/index. /new-project fills this in; edit any time.
 theme: tools          # one of the index's config.themes
-tags: [python, artifact]   # from the index's config.tags; new tags lowercase_with_underscores
-what: Seven recipes as combination grids, built to cook from on a phone.
-next: Decide whether the repo goes public so the homepage tile gets a Code link.
+tags: [python, artifact, roku]   # from the index's config.tags; new tags lowercase_with_underscores
+what: Eight recipes as combination grids, built to cook from on a phone, plus a Roku sideload app to cook from the TV.
+next: Try the Roku app on the TV (readable from the counter?), then decide whether the repo goes public so the homepage tile gets a Code link.
 active: false         # true pulls this repo's tasks into J's queue
 public: false         # informational; each sprint day's snapshot decides publishing
